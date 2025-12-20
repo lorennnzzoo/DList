@@ -14,7 +14,7 @@ int main()
 	{
 		person* p=malloc(sizeof(person));
 		p->Age=10;
-		p->Name="Bhanu";
+		p->Name="loren";
 		Append(list,p);
 
 		person* p2=Get(list,0);
