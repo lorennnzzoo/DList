@@ -75,9 +75,31 @@ void Remove(DList* list, size_t index) {
     return;
 }
 
-void* Get(DList* list,size_t index)
+void* GetOrNull(DList* list,size_t index)
 {
 	if(index>=list->Count)
 		return NULL;
 	return (char*)list->Data + list->type_size * index;
+}
+
+void* FirstOrNull(DList* list)
+{
+	if(list->Count==0)
+		return NULL;
+	return (char*)list->Data+list->type_size*0;
+}
+
+void* LastOrNull(DList* list)
+{
+	if(list->Count==0)
+		return NULL;
+	return (char*)list->Data+(list->type_size*(list->Count-1));
+}
+
+void Clear(DList* list)
+{
+	if(realloc(list->Data,list->type_size*1)){
+		list->Size=1;
+		list->Count=0;
+	}
 }

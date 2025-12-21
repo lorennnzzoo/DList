@@ -14,6 +14,9 @@ DList* Initialize(DList* list,size_t type_size);
 int Append(DList* list,void* item);
 void Delete(DList** list);
 void Remove(DList* list,size_t index);
-void* Get(DList* list,size_t index);
+void* GetOrNull(DList* list,size_t index);
+void* FirstOrNull(DList* list);
+void* LastOrNull(DList* list);
+void Clear(DList* list);
 
 #endif
