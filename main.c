@@ -30,8 +30,13 @@ int main()
 		Append(list,p3);
 
 		person* p_at=GetOrNull(list,1);
-		printf("2nd position Person Age : %d, Name : %s\n",p_at->Age,p_at->Name);
-		
+		if(p_at){
+			printf("2nd position Person Age : %d, Name : %s\n",p_at->Age,p_at->Name);
+		}
+		else{
+			printf("Null returned");
+		}
+
 		person* first_person=FirstOrNull(list);
 		if(first_person)
 		{
@@ -41,18 +46,25 @@ int main()
 			printf("Null returned");
 		}
 
-		
+
 		person* last_person=LastOrNull(list);
 		if(last_person)
 		{
 			printf("last position Person Age : %d, Name : %s\n",last_person->Age,last_person->Name);
 		}
 		else{
-			printf("Null returned");
+			printf("Null returned\n");
 		}
 		Clear(list);
 		printf("List count : %zu\n",list->Count);
 		printf("List size : %zu\n",list->Size);
+		person* p_at2=GetOrNull(list,1);
+		if(p_at2){
+			printf("2nd position Person Age : %d, Name : %s\n",p_at2->Age,p_at2->Name);
+		}
+		else{
+			printf("Null returned\n");
+		}
 		Delete(&list);
 	}
 }
