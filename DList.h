@@ -14,7 +14,7 @@ void ForEach(DList* list,void (*Element)(void*));
 DList* Initialize(DList* list,size_t type_size);
 int Append(DList* list,void* item);
 void Delete(DList** list);
-void Remove(DList* list,size_t index);
+void RemoveAt(DList* list,size_t index);
 void* GetOrNull(DList* list,size_t index);
 void* FirstOrNull(DList* list);
 void* LastOrNull(DList* list);

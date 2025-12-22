@@ -49,7 +49,7 @@ void Delete(DList** list)
 	}
 }
 
-void Remove(DList* list, size_t index) {
+void RemoveAt(DList* list, size_t index) {
     printf("Removing at %zu\n", index);
 
     if (index >= list->Count) {
