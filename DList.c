@@ -116,3 +116,87 @@ void ForEach(DList* list,void (*Element)(void*))
 		}
 	}
 }
+
+int Serialize(DList* list, char* file_name)
+{
+    FILE* file = fopen(file_name, "wb");
+    if (!file)
+    {
+        return -1;
+    }
+
+    size_t written_count = fwrite(&list->Size, sizeof(size_t), 1, file);
+    if (written_count != 1)
+    {
+        fclose(file);
+        return 1;
+    }
+    written_count = fwrite(&list->type_size, sizeof(size_t), 1, file);
+    if (written_count != 1)
+    {
+        fclose(file);
+        return 1;
+    }
+    written_count = fwrite(&list->Count, sizeof(size_t), 1, file);
+    if (written_count != 1)
+    {
+        fclose(file);
+        return 1;
+    }
+
+    written_count = fwrite(list->Data, list->type_size, list->Count, file);
+    if (written_count != list->Count)
+    {
+        fclose(file);
+        return 1;
+    }
+
+    fclose(file);
+    return 0;
+}
+
+DList* Deserialize(char* file_name)
+{
+    FILE* file = fopen(file_name, "rb");
+    if (!file)
+    {
+        return NULL;
+    }
+
+    DList* list = malloc(sizeof(DList));
+    if (!list)
+    {
+        fclose(file);
+        return NULL;
+    }
+
+    size_t read_count = fread(&list->Size, sizeof(size_t), 1, file);
+    if (read_count != 1)
+    {
+        fclose(file);
+        free(list);
+        return NULL;
+    }
+    fread(&list->type_size, sizeof(size_t), 1, file);
+    fread(&list->Count, sizeof(size_t), 1, file);
+
+    list->Data = malloc(list->type_size * list->Count);
+    if (!list->Data)
+    {
+        fclose(file);
+        free(list);
+        return NULL;
+    }
+
+    read_count = fread(list->Data, list->type_size, list->Count, file);
+    if (read_count != list->Count)
+    {
+        fclose(file);
+        free(list->Data);
+        free(list);
+        return NULL;
+    }
+
+    fclose(file);
+    return list;
+}
