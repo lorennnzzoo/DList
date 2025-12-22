@@ -2,8 +2,9 @@
 #include <stdlib.h>
 #include "DList.h"
 
-DList* Initialize(DList* list,size_t type_size)
+DList* Initialize(size_t type_size)
 {
+	DList* list=malloc(sizeof(DList));
         if(!list)
                 //user passed NULL pointer
                 return NULL;

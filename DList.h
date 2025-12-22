@@ -13,7 +13,7 @@ typedef struct
 void ForEach(DList* list,void (*Element)(void*));
 
 //Creation
-DList* Initialize(DList* list,size_t type_size);
+DList* Initialize(size_t type_size);
 
 //Accessing and Modifying items in List
 int Append(DList* list,void* item);
