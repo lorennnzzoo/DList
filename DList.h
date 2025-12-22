@@ -9,6 +9,7 @@ typedef struct DList
 	size_t type_size;
 } DList;
 
+void ForEach(DList* list,void (*Element)(void*));
 
 DList* Initialize(DList* list,size_t type_size);
 int Append(DList* list,void* item);

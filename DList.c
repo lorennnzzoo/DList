@@ -103,3 +103,16 @@ void Clear(DList* list)
 		list->Count=0;
 	}
 }
+
+
+void ForEach(DList* list,void (*Element)(void*))
+{
+	for(int i=0;i<list->Count;i++)
+	{
+		void* item=GetOrNull(list,i);
+		if(item)
+		{
+			Element(item);
+		}
+	}
+}
