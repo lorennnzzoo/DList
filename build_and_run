@@ -1,1 +1,0 @@
-gcc Pollutant.c DList.c -o Pollutant && ./Pollutant && rm Pollutant DList.bin
