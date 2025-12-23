@@ -1,3 +1,4 @@
+#include "DList.h"
 #ifndef POLLUTANT_H
 #define POLLUTANT_H
 
@@ -71,4 +72,5 @@ Pollutant create_com_pollutant(char* comport,size_t baudrate,char parity, size_t
 Pollutant create_tcp_pollutant(char* ip_address,size_t port,uint8_t slaveid,uint16_t address,char* datatype,enum ByteOrder byte_order);
 // Pollutant create_udp_pollutant(char* ip_address,char* datatype,char* byte_order);
 
+void Run(DList* p_list);
 #endif

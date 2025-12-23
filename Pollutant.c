@@ -121,28 +121,8 @@ void access_element(void* element)
 		read_modbus_rtu(pollutant);
 	}
 }
-int main(){
-	DList* p_list=Initialize(sizeof(Pollutant));
-
-	//create pollutants for com,tcp,udp
-	Pollutant tcp_pollutant=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,ABCD);
-	Pollutant tcp_pollutant2=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,BADC);
-	Pollutant tcp_pollutant3=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,CDAB);
-	Pollutant tcp_pollutant4=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,DCBA);
-
-
-	//append pollutants to p_list
-	Append(p_list,&tcp_pollutant);
-	Append(p_list,&tcp_pollutant2);
-	Append(p_list,&tcp_pollutant3);
-	Append(p_list,&tcp_pollutant4);
-
+void Run(DList* p_list){
 	ForEach(p_list,&access_element);
-
-	Delete(&p_list);
-
-
-
 }
 
 
