@@ -5,7 +5,7 @@
 
 void read_modbus_rtu(Pollutant* element)
 {
-	uint16_t tab_reg[8];
+	uint16_t tab_reg[REG32];
 
 	ComInfo cominfo=element->Connection.comport_information;
 	modbus_t* mb=modbus_new_rtu(cominfo.comport,cominfo.baudrate,cominfo.parity,cominfo.data_bits,cominfo.stop_bits);
@@ -26,18 +26,30 @@ void read_modbus_rtu(Pollutant* element)
 		printf("rtu connection failed\n");
 		goto error;
 	}
-	int rc=modbus_read_input_registers(mb,cominfo.address,8,tab_reg);
+	int rc=modbus_read_input_registers(mb,cominfo.address,REG32,tab_reg);
 	if(rc==-1)
 	{
 		printf("unable to read\n");
 		goto error;
 	}
 
-	for(int i=0;i<rc;i++)
+	float value;
+	switch(element->type_settings.byte_order)
 	{
-		printf("reg[%d] = %d\n",i+cominfo.address,tab_reg[i]);
+		case ABCD:
+			value=modbus_get_float_abcd(tab_reg);
+			break;
+		case BADC:
+			value=modbus_get_float_badc(tab_reg);
+			break;
+		case CDAB:
+			value=modbus_get_float_cdab(tab_reg);
+			break;
+		case DCBA:
+			value=modbus_get_float_dcba(tab_reg);
+			break;
 	}
-
+	printf("value generated : %f\n",value);
 error:
 
 	modbus_close(mb);
@@ -45,7 +57,7 @@ error:
 }
 void read_modbus_tcp(Pollutant* element)
 {
-	uint16_t tab_reg[8];
+	uint16_t tab_reg[REG32];
 
 	TcpInfo tcpinfo=element->Connection.tcp_information;
 	modbus_t* mb=modbus_new_tcp(tcpinfo.ip_address,tcpinfo.port);
@@ -66,17 +78,30 @@ void read_modbus_tcp(Pollutant* element)
 		printf("tcp connection failed\n");
 		goto error;
 	}
-	int rc=modbus_read_input_registers(mb,tcpinfo.address,8,tab_reg);
+	int rc=modbus_read_input_registers(mb,tcpinfo.address,REG32,tab_reg);
 	if(rc==-1)
 	{
 		printf("unable to read\n");
 		goto error;
 	}
 
-	for(int i=0;i<rc;i++)
+	float value;
+	switch(element->type_settings.byte_order)
 	{
-		printf("reg[%d] = %d\n",i+tcpinfo.address,tab_reg[i]);
+		case ABCD:
+			value=modbus_get_float_abcd(tab_reg);
+			break;
+		case BADC:
+			value=modbus_get_float_badc(tab_reg);
+			break;
+		case CDAB:
+			value=modbus_get_float_cdab(tab_reg);
+			break;
+		case DCBA:
+			value=modbus_get_float_dcba(tab_reg);
+			break;
 	}
+	printf("value generated : %f\n",value);
 
 error:
 
@@ -100,13 +125,17 @@ int main(){
 	DList* p_list=Initialize(sizeof(Pollutant));
 
 	//create pollutants for com,tcp,udp
-	Pollutant com_pollutant=create_com_pollutant("/dev/ttyAMA1",9600,NONE,1,8,1,31);
-	Pollutant tcp_pollutant=create_tcp_pollutant("45.8.248.56",502,10,31);
+	Pollutant tcp_pollutant=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,ABCD);
+	Pollutant tcp_pollutant2=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,BADC);
+	Pollutant tcp_pollutant3=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,CDAB);
+	Pollutant tcp_pollutant4=create_tcp_pollutant("45.8.248.56",502,10,31,INT16,DCBA);
 
 
 	//append pollutants to p_list
 	Append(p_list,&tcp_pollutant);
-	Append(p_list,&com_pollutant);
+	Append(p_list,&tcp_pollutant2);
+	Append(p_list,&tcp_pollutant3);
+	Append(p_list,&tcp_pollutant4);
 
 	ForEach(p_list,&access_element);
 
@@ -117,7 +146,7 @@ int main(){
 }
 
 
-Pollutant create_com_pollutant(char* comport,size_t baudrate,char parity, size_t stop_bits,size_t data_bits,uint8_t slaveid,uint16_t address){
+Pollutant create_com_pollutant(char* comport,size_t baudrate,char parity, size_t stop_bits,size_t data_bits,uint8_t slaveid,uint16_t address,char* datatype,enum ByteOrder byte_order){
 	ComInfo comport_information;
 	comport_information.baudrate=baudrate;
 	comport_information.parity=parity;
@@ -131,10 +160,16 @@ Pollutant create_com_pollutant(char* comport,size_t baudrate,char parity, size_t
 	pollutant.communication_type=COM;
 	pollutant.Connection.comport_information=comport_information;
 
+	DataTypeSettings typesettings;
+	typesettings.type=datatype;
+	typesettings.byte_order=byte_order;
+
+	pollutant.type_settings=typesettings;
+
 	return pollutant;
 }
 
-Pollutant create_tcp_pollutant(char* ip_address,size_t port,uint8_t slaveid,uint16_t address){
+Pollutant create_tcp_pollutant(char* ip_address,size_t port,uint8_t slaveid,uint16_t address,char* datatype,enum ByteOrder byte_order){
 	TcpInfo tcp_information;
 	tcp_information.ip_address=ip_address;
 	tcp_information.port=port;
@@ -146,16 +181,23 @@ Pollutant create_tcp_pollutant(char* ip_address,size_t port,uint8_t slaveid,uint
 	pollutant.communication_type=TCP;
 	pollutant.Connection.tcp_information=tcp_information;
 
-	return pollutant;
-}
-Pollutant create_udp_pollutant(char* ip_address){
-	UdpInfo udp_information;
-	udp_information.ip_address=ip_address;
+	DataTypeSettings typesettings;
+	typesettings.type=datatype;
+	typesettings.byte_order=byte_order;
 
+	pollutant.type_settings=typesettings;
 
-	Pollutant pollutant;
-	pollutant.communication_type=UDP;
-	pollutant.Connection.udp_information=udp_information;
 
 	return pollutant;
 }
+// Pollutant create_udp_pollutant(char* ip_address){
+// 	UdpInfo udp_information;
+// 	udp_information.ip_address=ip_address;
+//
+//
+// 	Pollutant pollutant;
+// 	pollutant.communication_type=UDP;
+// 	pollutant.Connection.udp_information=udp_information;
+//
+// 	return pollutant;
+// }
