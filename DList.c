@@ -108,7 +108,7 @@ void Clear(DList* list)
 
 void ForEach(DList* list,void (*Element)(void*))
 {
-	for(int i=0;i<list->Count;i++)
+	for(size_t i=0;i<list->Count;i++)
 	{
 		void* item=GetOrNull(list,i);
 		if(item)
