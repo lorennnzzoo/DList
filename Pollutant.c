@@ -26,7 +26,7 @@ void read_modbus_rtu(Pollutant* element)
 		printf("rtu connection failed\n");
 		goto error;
 	}
-	int rc=modbus_read_input_registers(mb,cominfo.address,REG32,tab_reg);
+	int rc=modbus_read_registers(mb,cominfo.address,REG32,tab_reg);
 	if(rc==-1)
 	{
 		printf("unable to read\n");
@@ -78,7 +78,7 @@ void read_modbus_tcp(Pollutant* element)
 		printf("tcp connection failed\n");
 		goto error;
 	}
-	int rc=modbus_read_input_registers(mb,tcpinfo.address,REG32,tab_reg);
+	int rc=modbus_read_registers(mb,tcpinfo.address,REG32,tab_reg);
 	if(rc==-1)
 	{
 		printf("unable to read\n");
